@@ -27,7 +27,15 @@ class GravCamp(arcade.Sprite):
         self.center_x = self.x
         self.center_y = self.y
         
+        if len(self.balls) == 0:
+            self.colorBalls = None
+        
         if len(self.balls) <= self.limitBalls:
+            for b in self.balls:
+                if b.color != self.colorBalls:
+                    self.colorBalls = b.color
+                    for bc in self.balls:
+                       bc.color = b.color
             for i, ball in enumerate(self.balls):
                 ball.x = self.center_x + self.pos[i][0]
                 ball.y = self.center_y + self.pos[i][1]

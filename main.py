@@ -139,13 +139,14 @@ class App(arcade.Window):
                 )
 
     def on_update(self, delta_time: float):
-        for bg in self.bgs:
-            bg.balls = arcade.check_for_collision_with_list(bg, self.balls)
-            bg.update()
-            if len(bg.balls) >= bg.limitBalls:
-                self.explosion(bg)
-        self.balls.update()
-        self.pointBall.update()
+        if self.balls != []:
+            for bg in self.bgs:
+                bg.balls = arcade.check_for_collision_with_list(bg, self.balls)
+                bg.update()
+                if len(bg.balls) >= bg.limitBalls:
+                    self.explosion(bg)
+            self.balls.update()
+            self.pointBall.update()
 
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
         self.pointBall.center_x = x
@@ -156,24 +157,24 @@ class App(arcade.Window):
             grid = arcade.check_for_collision_with_list(self.pointBall, self.bgs)
             if grid != []:
                 box = grid[0]
-                # if (
-                #     box.colorBalls == None
-                #     or box.colorBalls == self.listOfColors[self.turn]
-                # ):
-                #     if box.colorBalls == None:
-                #         box.colorBalls = self.listOfColors[self.turn]
-                ball = Ball(
-                    image="assets/ball_image.png",
-                    distance=1,
-                    angle=1,
-                    x=x,
-                    y=y,
-                    color=self.listOfColors[self.turn],
-                )
-                self.balls.append(ball)
-                box.balls.append(ball)
-                self.turn += 1
-                self.turn = self.turn % 5
+                if (
+                    box.colorBalls == None
+                    or box.colorBalls == self.listOfColors[self.turn]
+                ):
+                    if box.colorBalls == None:
+                        box.colorBalls = self.listOfColors[self.turn]
+                    ball = Ball(
+                        image="assets/ball_image.png",
+                        distance=1,
+                        angle=1,
+                        x=x,
+                        y=y,
+                        color=self.listOfColors[self.turn],
+                    )
+                    self.balls.append(ball)
+                    box.balls.append(ball)
+                    self.turn += 1
+                    self.turn = self.turn % len(self.listOfColors)
 
     def explosion(self, box: GravCamp):
         v = box.vmov
