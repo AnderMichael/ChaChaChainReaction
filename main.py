@@ -23,7 +23,8 @@ class App(arcade.Window):
         ]
 
         self.turn = 0
-
+        self.minBalls = 0
+        self.start = False
         self.pointBall = arcade.Sprite("assets/ball_image.png", 0.001)
         self.balls = arcade.SpriteList()
         self.bgs = arcade.SpriteList()
@@ -139,14 +140,22 @@ class App(arcade.Window):
                 )
 
     def on_update(self, delta_time: float):
-        if self.balls != []:
-            for bg in self.bgs:
-                bg.balls = arcade.check_for_collision_with_list(bg, self.balls)
-                bg.update()
-                if len(bg.balls) >= bg.limitBalls:
-                    self.explosion(bg)
-            self.balls.update()
-            self.pointBall.update()
+        for bg in self.bgs:
+            bg.balls = arcade.check_for_collision_with_list(bg, self.balls)
+            bg.update()
+            if len(bg.balls) >= bg.limitBalls:
+                self.explosion(bg)
+        self.balls.update()
+        if self.minBalls >= len(self.listOfColors):
+            remain = [
+                ball
+                for ball in self.balls
+                if ball.color == self.listOfColors[self.turn]
+            ]
+            if remain == []:
+                self.listOfColors.pop(self.turn)
+                self.turn = self.turn % len(self.listOfColors)
+        self.pointBall.update()
 
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
         self.pointBall.center_x = x
@@ -156,6 +165,8 @@ class App(arcade.Window):
         if button == arcade.MOUSE_BUTTON_LEFT:
             grid = arcade.check_for_collision_with_list(self.pointBall, self.bgs)
             if grid != []:
+                if self.minBalls < len(self.listOfColors):
+                    self.minBalls += 1
                 box = grid[0]
                 if (
                     box.colorBalls == None
