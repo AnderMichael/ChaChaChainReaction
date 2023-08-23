@@ -5,7 +5,7 @@ import arcade
 
 WIDTH = 1800
 HEIGHT = 800
-TITLE = "Chain Reaction"
+TITLE = "Cha-Cha-Chain Reaction"
 
 
 class Menu(arcade.View):
