@@ -1,26 +1,219 @@
-import math
+from arcade.application import Window
 from ball import Ball
 from grav_camp import GravCamp
 import arcade
-import pymunk
 
 WIDTH = 1800
 HEIGHT = 800
 TITLE = "Chain Reaction"
 
 
-class App(arcade.Window):
-    def __init__(self):
-        super().__init__(WIDTH, HEIGHT, TITLE)
+class Menu(arcade.View):
+    def __init__(self, window: Window = None):
+        super().__init__(window)
+
+    def on_show(self):
         arcade.set_background_color(arcade.color.BLACK)
 
-        self.listOfColors = [
+    def on_draw(self):
+        arcade.start_render()
+        arcade.draw_text(
+            "Cha-Cha-Chain Reaction",
+            WIDTH / 2 - 100,
+            HEIGHT / 2 + 100,
+            arcade.color.CHOCOLATE,
+            font_size=50,
+            anchor_x="center",
+        )
+
+        arcade.draw_polygon_filled(
+            [
+                (600, 150),
+                (600, 180),
+                (1000, 180),
+                (1000, 150),
+            ],
+            arcade.color.WHITE,
+        )
+
+        arcade.draw_polygon_filled(
+            [
+                (600, 200),
+                (600, 230),
+                (1000, 230),
+                (1000, 200),
+            ],
+            arcade.color.WHITE,
+        )
+
+        arcade.draw_polygon_filled(
+            [
+                (600, 250),
+                (600, 280),
+                (1000, 280),
+                (1000, 250),
+            ],
+            arcade.color.WHITE,
+        )
+
+        arcade.draw_polygon_filled(
+            [
+                (600, 300),
+                (600, 330),
+                (1000, 330),
+                (1000, 300),
+            ],
+            arcade.color.WHITE,
+        )
+
+        arcade.draw_polygon_filled(
+            [
+                (600, 350),
+                (600, 380),
+                (1000, 380),
+                (1000, 350),
+            ],
+            arcade.color.WHITE,
+        )
+        arcade.draw_text(
+            "Two Players",
+            800,
+            365,
+            arcade.color.BLACK,
+            font_size=15,
+            anchor_x="center",
+        )
+
+        arcade.draw_text(
+            "Three Players",
+            800,
+            315,
+            arcade.color.BLACK,
+            font_size=15,
+            anchor_x="center",
+        )
+
+        arcade.draw_text(
+            "Four Players",
+            800,
+            265,
+            arcade.color.BLACK,
+            font_size=15,
+            anchor_x="center",
+        )
+
+        arcade.draw_text(
+            "Five Players",
+            800,
+            215,
+            arcade.color.BLACK,
+            font_size=15,
+            anchor_x="center",
+        )
+
+        arcade.draw_text(
+            "Close Game",
+            800,
+            165,
+            arcade.color.BLACK,
+            font_size=15,
+            anchor_x="center",
+        )
+
+    def on_mouse_release(self, x: int, y: int, button: int, modifiers: int):
+        if 600 < x < 1000:
+            if 150 < y < 180:
+                arcade.close_window()
+            elif 200 < y < 230:
+                self.window.show_view(App(player_count=5, window=self.window))
+            elif 250 < y < 280:
+                self.window.show_view(App(player_count=4, window=self.window))
+            elif 300 < y < 330:
+                self.window.show_view(App(player_count=3, window=self.window))
+            elif 350 < y < 380:
+                self.window.show_view(App(player_count=2, window=self.window))
+
+
+class Winner(arcade.View):
+    def __init__(self, window: Window = None, winner: str = arcade.color.BLACK):
+        super().__init__(window)
+        self.winner = winner
+
+    def on_show(self):
+        arcade.set_background_color(arcade.color.BLACK)
+
+    def on_draw(self):
+        arcade.start_render()
+        arcade.draw_text(
+            "Winner",
+            WIDTH / 2 - 100,
+            HEIGHT / 2 + 100,
+            self.winner,
+            font_size=50,
+            anchor_x="center",
+        )
+
+        arcade.draw_polygon_filled(
+            [
+                (600, 300),
+                (600, 330),
+                (1000, 330),
+                (1000, 300),
+            ],
+            arcade.color.WHITE,
+        )
+
+        arcade.draw_polygon_filled(
+            [
+                (600, 350),
+                (600, 380),
+                (1000, 380),
+                (1000, 350),
+            ],
+            arcade.color.WHITE,
+        )
+        arcade.draw_text(
+            "Play Again!",
+            800,
+            365,
+            arcade.color.BLACK,
+            font_size=15,
+            anchor_x="center",
+        )
+
+        arcade.draw_text(
+            "Close Game",
+            800,
+            315,
+            arcade.color.BLACK,
+            font_size=15,
+            anchor_x="center",
+        )
+
+    def on_mouse_release(self, x: int, y: int, button: int, modifiers: int):
+        if 600 < x < 1000:
+            if 300 < y < 330:
+                arcade.close_window()
+            elif 350 < y < 380:
+                self.window.show_view(Menu(window=self.window))
+
+
+class App(arcade.View):
+    def __init__(self, player_count: int = 5, window: Window = None):
+        super().__init__()
+        arcade.set_background_color(arcade.color.BLACK)
+
+        self.window = window
+
+        listOfColors = [
             arcade.color.RED,
             arcade.color.YELLOW,
             arcade.color.BLUE,
             arcade.color.VIOLET,
             arcade.color.GREEN,
         ]
+
+        self.listOfColors = listOfColors[0:player_count]
 
         self.turn = 0
         self.minBalls = 0
@@ -152,6 +345,12 @@ class App(arcade.Window):
                 for ball in self.balls
                 if ball.color == self.listOfColors[self.turn]
             ]
+
+            if len(self.listOfColors) == 1:
+                self.window.show_view(
+                    Winner(winner=self.listOfColors[0], window=self.window)
+                )
+
             if remain == []:
                 self.listOfColors.pop(self.turn)
                 self.turn = self.turn % len(self.listOfColors)
@@ -226,7 +425,8 @@ class App(arcade.Window):
 
 
 def main():
-    app = App()
+    app = arcade.Window(WIDTH, HEIGHT, TITLE)
+    app.show_view(Menu(app))
     arcade.run()
 
 
